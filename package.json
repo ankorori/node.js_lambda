@@ -9,7 +9,7 @@
     "ts-jest": "^29.1.1"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest --env=node --verbose"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.470.0",
