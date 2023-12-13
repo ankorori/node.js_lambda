@@ -16,17 +16,6 @@ const response = (statusCode, event, body) => {
     };
 };
 
-function createId () {
-    const str = "0123456789abcdefghijklmnopqrstuvwxyz";
-    const Length = 32;
-    let rundomId = "";
-    for (let i = 0; i < Length; i++) {
-        let selected = Math.floor(Math.random() * str.length);
-        rundomId += str.substring(selected, selected + 1);
-    }
-    return rundomId;
-}
-
 export const handler = async (event) => {
     try {
         console.log(event);
