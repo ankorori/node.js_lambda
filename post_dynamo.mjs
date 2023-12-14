@@ -1,14 +1,13 @@
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
-const response = (statusCode, event, body) => {
-    const httpMethod = event.httpMethod;
+const response = (statusCode, body) => {
     return {
         statusCode: statusCode,
         headers: {
             "Access-Control-Allow-Headers" : "Content-Type",
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": httpMethod
+            "Access-Control-Allow-Methods": "POST"
         },
         body: JSON.stringify(
             body
@@ -54,7 +53,7 @@ export const handler = async (event) => {
                 },
             })
         );
-        return response(201, event, true);
+        return response(201, true);
     } catch (error) {
         console.log(error);
         return {

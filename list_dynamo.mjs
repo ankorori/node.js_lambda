@@ -1,14 +1,13 @@
 import { DynamoDBDocumentClient, paginateScan } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
-const response = (statusCode, event, body) => {
-    const httpMethod = event.httpMethod;
+const response = (statusCode, body) => {
     return {
         statusCode: statusCode,
         headers: {
             "Access-Control-Allow-Headers" : "Content-Type",
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": httpMethod
+            "Access-Control-Allow-Methods": "GET"
         },
         body: JSON.stringify(
             body
@@ -29,22 +28,21 @@ export const handler = async (event) => {
         const dynamo = DynamoDBDocumentClient.from( DynamoDBclient, translateConfig );
         const paginatorConfig = {
             client: dynamo,
-            pageSize: 1,
+            pageSize: 10,
         };
-        
+
         const paginator = paginateScan(paginatorConfig, {
                 TableName: "Dynamo_test",
             }
         );
         const items = {};
-        items.items = [];
         let i = 0;
         for await (const page of paginator) {
-            items.items[i] = page.Items[0];
+            items.items = page.Items;
             i++;
         }
         items.totalRecordsCount = Object.keys(items.items).length;
-        return response(200, event, items);
+        return response(200, items);
     } catch (error) {
         console.log(error);
         return {
