@@ -1,6 +1,19 @@
 import { DynamoDBDocumentClient, paginateScan } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
+export const initDynamoClient = () => {
+    const marshallOptions = {
+        removeUndefinedValues: true,
+    };
+    const translateConfig = { marshallOptions };
+    const DynamoDBclient = new DynamoDBClient({
+        region: 'ap-northeast-1'
+    });
+    
+    const dynamo = DynamoDBDocumentClient.from( DynamoDBclient, translateConfig );
+    return dynamo;
+}
+
 const response = (statusCode, body) => {
     return {
         statusCode: statusCode,
@@ -17,15 +30,7 @@ const response = (statusCode, body) => {
 
 export const handler = async (event) => {
     try {
-        const marshallOptions = {
-            convertEmptyValues: false,
-            removeUndefinedValues: true,
-        };
-        const translateConfig = { marshallOptions };
-        const DynamoDBclient = new DynamoDBClient({
-            region: 'ap-northeast-1'
-        });
-        const dynamo = DynamoDBDocumentClient.from( DynamoDBclient, translateConfig );
+        const dynamo = initDynamoClient();
         const paginatorConfig = {
             client: dynamo,
             pageSize: 10,

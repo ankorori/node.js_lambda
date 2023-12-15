@@ -1,6 +1,19 @@
 import { DynamoDBDocumentClient, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
+export const initDynamoClient = () => {
+    const marshallOptions = {
+        removeUndefinedValues: true,
+    };
+    const translateConfig = { marshallOptions };
+    const DynamoDBclient = new DynamoDBClient({
+        region: 'ap-northeast-1'
+    });
+    
+    const dynamo = DynamoDBDocumentClient.from( DynamoDBclient, translateConfig );
+    return dynamo;
+}
+
 const response = (statusCode, event, body) => {
     const httpMethod = event.httpMethod;
     return {
@@ -18,15 +31,8 @@ const response = (statusCode, event, body) => {
 
 export const handler = async (event) => {
     try {
-        const marshallOptions = {
-            removeUndefinedValues: true,
-        };
-        const translateConfig = { marshallOptions };
-        const DynamoDBclient = new DynamoDBClient({
-            region: 'ap-northeast-1'
-        });
+        const dynamo = initDynamoClient();
         const id = event.pathParameters.id;
-        const dynamo = DynamoDBDocumentClient.from( DynamoDBclient, translateConfig );
         await dynamo.send(
             new DeleteCommand({
                 TableName: "Dynamo_test",

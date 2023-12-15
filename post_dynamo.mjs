@@ -1,6 +1,19 @@
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
+export const initDynamoClient = () => {
+    const marshallOptions = {
+        removeUndefinedValues: true,
+    };
+    const translateConfig = { marshallOptions };
+    const DynamoDBclient = new DynamoDBClient({
+        region: 'ap-northeast-1'
+    });
+    
+    const dynamo = DynamoDBDocumentClient.from( DynamoDBclient, translateConfig );
+    return dynamo;
+}
+
 const response = (statusCode, body) => {
     return {
         statusCode: statusCode,
@@ -30,15 +43,7 @@ export const handler = async (event) => {
     try {
         console.log(event);
 
-        const marshallOptions = {
-            removeUndefinedValues: true,
-        };
-        const translateConfig = { marshallOptions };
-        const DynamoDBclient = new DynamoDBClient({
-            region: 'ap-northeast-1'
-        });
-
-        const dynamo = DynamoDBDocumentClient.from( DynamoDBclient, translateConfig );
+        const dynamo = initDynamoClient();
         const body = JSON.parse(event.body);
         const id = createId();
         console.log(id);
