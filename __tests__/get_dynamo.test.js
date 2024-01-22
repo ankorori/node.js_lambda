@@ -1,8 +1,6 @@
 import { handler as getItem } from "../get_dynamo.mjs";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { mockClient } from "aws-sdk-client-mock";
-import 'aws-sdk-client-mock-jest'
 
 const ddbMock = mockClient(DynamoDBDocumentClient)
 
@@ -22,7 +20,17 @@ describe("handler get item", () => {
         };
         ddbMock.on(GetCommand).resolves(expectValue)
         const result = await getItem(event)
-        expect(result.body).toEqual(JSON.stringify(expectValue.Item))
+        expect(result).toEqual({
+            statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Headers" : "Content-Type",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET"
+            },
+            body: JSON.stringify(
+                {id:"test",value:"memo"}
+            )
+        })
     })
 
     it("item not found test", async () => {
@@ -85,9 +93,7 @@ describe("handler get item error test", () => {
                 "id": "test"
             }
         };
-        const expectValue = {
-            Item: { id: event.pathParameters.id, value: "memo" }
-        };
+        const expectValue = "ERR"
         ddbMock.on(GetCommand).rejects(expectValue)
         const result = await getItem(event)
         expect(result).toEqual({
